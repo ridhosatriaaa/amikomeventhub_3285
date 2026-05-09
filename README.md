@@ -11,3 +11,7 @@ Halaman transaksi : https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/a
 Halaman beranda : https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/
 Halaman detail event : https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/event-detail
 Halaman checkout : https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/checkout
+
+
+Tugas 4
+Kelola event: https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/admin/events
