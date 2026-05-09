@@ -64,13 +64,13 @@ class EventController extends Controller
             'location'    => 'required',
             'price'       => 'required|numeric',
             'stock'       => 'required|numeric',
-            'poster'      => 'nullable|image|max:2048',
+            'poster_path'      => 'nullable|image|max:2048',
         ]);
 
 
         if ($request->hasFile('poster')) {
             if ($event->poster_path) Storage::disk('public')->delete($event->poster_path);
-            $data['poster_path'] = $request->file('poster')->store('posters', 'public');
+            $data['poster_path'] = $request->file('poster_path')->store('posters', 'public');
         }
 
 
