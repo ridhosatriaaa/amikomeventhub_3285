@@ -9,6 +9,7 @@ class TransactionsController extends Controller
 {
     public function index()
     {
-        return view('admin.transactions');
+        // Menampilkan halaman transaksi admin
+        return view('admin.transactions.index');
     }
 }
