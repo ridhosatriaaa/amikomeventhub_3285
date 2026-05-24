@@ -97,5 +97,15 @@ class DatabaseSeeder extends Seeder
             'stock' => 100,
             'poster_path' => 'posters/event-6.png',
         ]);
+
+        \App\Models\Partner::create([
+            'name' => 'Amikom',
+            'logo_url' => 'partners/5jA6pmgnewlkVI0p3XOSuKMWs8Sv2KEh8ypuUwZO.png',
+        ]);
+        \App\Models\Partner::create([
+            'name' => 'Amikom',
+            'logo_url' => 'partners/7dDHcfiJg5BFYXFYt3KTVvhHj3hnMYU1drSwuoNp.jpg',
+        ]);
+        
     }
 }
