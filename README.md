@@ -17,3 +17,5 @@ Tugas 4
 Kelola event: https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/admin/events
 
 UTS DIGITAL BISNIS: https://github.com/ridhosatriaaa/amikomeventhub_3285/tree/ujian-tengah-semester-24.12.3285
+https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/
+
