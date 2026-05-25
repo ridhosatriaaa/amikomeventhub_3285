@@ -16,9 +16,4 @@ Halaman checkout : https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/ch
 Tugas 4
 Kelola event: https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/admin/events
 
-UTS DIGITAL BISNIS: 🔗 Commit terbaru
-Commit terbaru pada branch ujian-tengah-semester-24.12.3285 adalah:
-
-Hash: ca846d784efe7bf74bc9d8d32c8ffe515052aaf5
-Pesan: UTS_DB
-Link commit-nya:https://github.com/ridhosatriaaa/amikomeventhub_3285/commit/ca846d784efe7bf74bc9d8d32c8ffe515052aaf5
+UTS DIGITAL BISNIS: https://github.com/ridhosatriaaa/amikomeventhub_3285/tree/ujian-tengah-semester-24.12.3285
