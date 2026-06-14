@@ -21,3 +21,6 @@ https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/
 
 https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/
 
+PERTEMUAN 8 - AUTHENTICATION & MIDDLEWARE
+https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/admin/login
+
