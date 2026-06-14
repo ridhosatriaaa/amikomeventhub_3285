@@ -65,14 +65,20 @@ class EventController extends Controller
             'location'    => 'required|string|max:255',
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
-            'poster'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // PERBAIKAN: Menggunakan poster_path agar selaras dengan form edit
+            'poster_path' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        if ($request->hasFile('poster')) {
+        // PERBAIKAN: Menggunakan poster_path pada pengecekan file
+        if ($request->hasFile('poster_path')) {
+            
+            // Hapus poster lama jika ada agar storage tidak penuh
             if ($event->poster_path) {
                 Storage::disk('public')->delete($event->poster_path);
             }
-            $validated['poster_path'] = $request->file('poster')->store('posters', 'public');
+            
+            // Simpan poster baru dan masukkan path-nya ke array validated
+            $validated['poster_path'] = $request->file('poster_path')->store('posters', 'public');
         }
 
         $event->update($validated);
@@ -84,6 +90,7 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
 
+        // Hapus poster dari storage sebelum menghapus data event
         if ($event->poster_path) {
             Storage::disk('public')->delete($event->poster_path);
         }

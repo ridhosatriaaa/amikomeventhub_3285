@@ -2,24 +2,35 @@
 
 use Illuminate\Support\Facades\Route;
 
+// USER CONTROLLERS
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TicketController;
-use App\Http\Controllers\CheckoutController; // MENAMBAHKAN INI
+use App\Http\Controllers\CheckoutController;
 
+// ADMIN CONTROLLERS
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TransactionsController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PartnersController;
-use App\Models\Event;
 use App\Http\Controllers\Admin\EventController as EventAdminController;
 
 /*
 |--------------------------------------------------------------------------
-| USER AREA (Untuk Pengunjung Biasa)
+| ROUTE REDIRECT DEFAULT LOGIN
 |--------------------------------------------------------------------------
 */
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
 
+
+/*
+|--------------------------------------------------------------------------
+| USER AREA (Untuk Pengunjung Biasa - Tanpa Middleware)
+|--------------------------------------------------------------------------
+*/
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Rute Detail Event
@@ -28,13 +39,13 @@ Route::get('/event-detail/{id}', [EventController::class, 'show'])->name('event.
 // Rute Tampilan Halaman Checkout
 Route::get('/checkout/{id}', [EventController::class, 'checkout'])->name('checkout');
 
-// Rute Proses Simpan Checkout (DIUBAH: Menggunakan CheckoutController)
+// Rute Proses Simpan Checkout
 Route::post('/checkout/process/{id}', [CheckoutController::class, 'process'])->name('checkout.process');
 
 // Rute e-ticket alternatif (Jika menggunakan Order ID)
 Route::get('/e-ticket/{order_id}', [EventController::class, 'showTicket'])->name('ticket.show');
 
-// Rute Halaman Tiket (DIUBAH: Menggunakan TicketController agar terhubung dengan data Event & Nama)
+// Rute Halaman Tiket
 Route::get('/ticket/{id}', [TicketController::class, 'index'])->name('ticket');
 
 
@@ -43,35 +54,39 @@ Route::get('/ticket/{id}', [TicketController::class, 'index'])->name('ticket');
 | ADMIN AREA (Khusus Halaman Admin)
 |--------------------------------------------------------------------------
 */
-
+// Grouping untuk URL berawalan /admin
 Route::prefix('admin')->name('admin.')->group(function () {
+    
+    // Rute Login & Logout (Bebas akses, tidak boleh masuk middleware auth)
+    Route::get('login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-    // DASHBOARD
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // MENGAMANKAN ROUTE ADMINISTRASI DI BALIK TEMBOK (MIDDLEWARE)
+    Route::middleware(['auth', 'admin'])->group(function () {
+        
+        // DASHBOARD
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // EVENTS CRUD
-    Route::get('/events', [EventAdminController::class, 'index'])->name('events.index');
-    Route::get('/events/create', [EventAdminController::class, 'create'])->name('events.create');
-    Route::post('/events', [EventAdminController::class, 'store'])->name('events.store');
-    Route::get('/events/{event}/edit', [EventAdminController::class, 'edit'])->name('events.edit');
-    Route::put('/events/{event}', [EventAdminController::class, 'update'])->name('events.update');
-    Route::delete('/events/{event}', [EventAdminController::class, 'destroy'])->name('events.destroy');
+        // EVENTS CRUD
+        Route::get('/events', [EventAdminController::class, 'index'])->name('events.index');
+        Route::get('/events/create', [EventAdminController::class, 'create'])->name('events.create');
+        Route::post('/events', [EventAdminController::class, 'store'])->name('events.store');
+        Route::get('/events/{event}/edit', [EventAdminController::class, 'edit'])->name('events.edit');
+        Route::put('/events/{event}', [EventAdminController::class, 'update'])->name('events.update');
+        Route::delete('/events/{event}', [EventAdminController::class, 'destroy'])->name('events.destroy');
 
-    // TRANSACTIONS
-    Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions.index');
+        // TRANSACTIONS
+        Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions.index');
 
-    // CATEGORIES
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
-    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+        // CATEGORIES
+        Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+        Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+        Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+        Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
-    // PARTNERS CRUD
-    // PARTNERS CRUD
-
-// PARTNERS CRUD (Otomatis membuat rute index, create, store, edit, update, destroy)
-Route::resource('partners', App\Http\Controllers\Admin\PartnersController::class);
-
-
-
+        // PARTNERS CRUD
+        Route::resource('partners', PartnersController::class);
+        
+    });
 });
