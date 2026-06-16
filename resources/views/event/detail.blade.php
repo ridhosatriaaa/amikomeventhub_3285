@@ -91,7 +91,8 @@
                         </p>
                     </div>
                     <div>
-                        <a href="{{ route('checkout', ['id' => $event->id]) }}" class="inline-block px-10 py-5 bg-white text-indigo-600 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-xl">
+                        {{-- Route Tombol Sudah Diperbarui Ke checkout.create --}}
+                        <a href="{{ route('checkout.create', $event->id) }}" class="inline-block px-10 py-5 bg-white text-indigo-600 rounded-2xl font-black text-xl hover:scale-105 transition-transform shadow-xl">
                             Pesan Sekarang
                         </a>
                     </div>

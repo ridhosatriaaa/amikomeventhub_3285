@@ -9,17 +9,25 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    // Tambahkan total_amount dan lainnya agar bisa diisi (Mass Assignment)
+    /**
+     * Properti yang diizinkan untuk diisi secara massal (Mass Assignment).
+     * Sesuaikan nama kolom (misal: 'total_price' vs 'total_amount') 
+     * dengan yang ada di file migration database kamu.
+     */
     protected $fillable = [
-        'event_id',
-        'name',
-        'email',
-        'phone',
-        'total_amount',
-        'status',
+        'event_id', 
+        'order_id', 
+        'customer_name', 
+        'customer_email', 
+        'customer_phone', 
+        'total_price', 
+        'status', 
+        'snap_token'
     ];
 
-    // Relasi balik ke Event
+    /**
+     * Relasi balik (Inverse One-to-Many) ke model Event.
+     */
     public function event()
     {
         return $this->belongsTo(Event::class);

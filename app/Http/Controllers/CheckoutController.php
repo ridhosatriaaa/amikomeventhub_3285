@@ -4,39 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Transaction;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
-    public function process(Request $request, $id)
+    /**
+     * Menampilkan halaman form checkout.
+     */
+    public function create(Event $event)
     {
-        // 1. Validasi input dari user
+        // Mengambil daftar kategori untuk keperluan menu footer
+        $categories = Category::all();
+
+        return view('checkout.create', compact('event', 'categories'));
+    }
+
+    /**
+     * Memproses penyimpanan transaksi checkout.
+     */
+    public function store(Request $request, Event $event)
+    {
+        // 1. Validasi Input Kredensial Pelanggan
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'required|string|max:20',
         ]);
 
-        // 2. Ambil data event berdasarkan ID
-        $event = Event::findOrFail($id);
-        
-        // 3. Hitung total (harga event + biaya layanan 5000 jika berbayar)
-        $totalAmount = $event->price == 0 ? 0 : $event->price + 5000;
+        // 2. Cegah Check-out Jika Tiket Habis
+        if ($event->stock <= 0) {
+            return back()->with('error', 'Mohon maaf, tiket untuk acara ini sudah habis.');
+        }
 
-        // 4. Simpan ke database
+        // 3. Generate Kode TRX (Unik)
+        $orderId = 'TRX-' . time() . '-' . Str::random(5);
+        $totalPrice = $event->price + 5000; // Menambahkan biaya admin (dummy)
+
+        // 4. Merekam Transaksi ke Database
         $transaction = Transaction::create([
             'event_id' => $event->id,
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'total_amount' => $totalAmount,
-            'status' => 'success', // Asumsi pembayaran langsung sukses
+            'order_id' => $orderId,
+            'customer_name' => $request->customer_name,
+            'customer_email' => $request->customer_email,
+            'customer_phone' => $request->customer_phone,
+            'total_price' => $totalPrice,
+            'status' => 'Pending', // Status Awal
         ]);
 
-        // 5. Redirect ke e-ticket membawa ID event dan nama pembeli
+        // 5. SEKARANG SUDAH DIARAHKAN LANGSUNG KE HALAMAN TIKET
+        // Membawa ID Event dan query string ?name=Nama_Pembeli
         return redirect()->route('ticket', [
             'id' => $event->id, 
-            'name' => $transaction->name
-        ]);
+            'name' => $request->customer_name
+        ]); 
     }
 }

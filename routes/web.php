@@ -36,11 +36,11 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Rute Detail Event
 Route::get('/event-detail/{id}', [EventController::class, 'show'])->name('event.detail');
 
-// Rute Tampilan Halaman Checkout
-Route::get('/checkout/{id}', [EventController::class, 'checkout'])->name('checkout');
+// Rute Tampilan Halaman Checkout (Diperbarui menggunakan Route Model Binding)
+Route::get('/checkout/{event}', [CheckoutController::class, 'create'])->name('checkout.create');
 
-// Rute Proses Simpan Checkout
-Route::post('/checkout/process/{id}', [CheckoutController::class, 'process'])->name('checkout.process');
+// Rute Proses Simpan Checkout (Diperbarui menggunakan Route Model Binding)
+Route::post('/checkout/{event}', [CheckoutController::class, 'store'])->name('checkout.store');
 
 // Rute e-ticket alternatif (Jika menggunakan Order ID)
 Route::get('/e-ticket/{order_id}', [EventController::class, 'showTicket'])->name('ticket.show');
@@ -77,7 +77,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/events/{event}', [EventAdminController::class, 'destroy'])->name('events.destroy');
 
         // TRANSACTIONS
-        Route::get('/transactions', [TransactionsController::class, 'index'])->name('transactions.index');
+        Route::get('transactions', [\App\Http\Controllers\Admin\TransactionController::class, 'index'])->name('transactions.index');
 
         // CATEGORIES
         Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');

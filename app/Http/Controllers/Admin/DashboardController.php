@@ -11,8 +11,8 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // 1. Hitung total pendapatan dari transaksi yang sukses
-        $totalRevenue = Transaction::where('status', 'success')->sum('total_amount');
+        // 1. Hitung total pendapatan dari transaksi yang sukses (Diubah dari total_amount ke total_price)
+        $totalRevenue = Transaction::where('status', 'success')->sum('total_price');
         
         // 2. Hitung jumlah tiket yang terjual (asumsi 1 transaksi = 1 tiket)
         $ticketsSold = Transaction::where('status', 'success')->count();

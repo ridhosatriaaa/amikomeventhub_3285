@@ -11,11 +11,14 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->string('email');
-            $table->string('phone');
-            $table->integer('total_amount'); // <-- INI KOLOM YANG MEMBUAT ERROR TADI
-            $table->string('status')->default('pending'); // success, pending, failed
+            
+            // Kolom di bawah ini disesuaikan agar cocok dengan CheckoutController
+            $table->string('order_id')->unique(); 
+            $table->string('customer_name');
+            $table->string('customer_email');
+            $table->string('customer_phone');
+            $table->integer('total_price'); 
+            $table->string('status')->default('Pending'); // success, Pending, failed
             $table->timestamps();
         });
     }
