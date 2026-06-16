@@ -24,3 +24,6 @@ https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/
 PERTEMUAN 8 - AUTHENTICATION & MIDDLEWARE
 https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/admin/login
 
+Pertemuan 10 - CHECKOUT LOGIC & TRANSAKSI
+https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/admin/transactions
+
