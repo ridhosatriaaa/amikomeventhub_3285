@@ -3,36 +3,29 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Transaction; // Pastikan model Transaction di-import
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // 1. Hitung total pendapatan dari transaksi yang sukses (Diubah dari total_amount ke total_price)
-        $totalRevenue = Transaction::where('status', 'success')->sum('total_price');
+        // 1. Menjumlahkan semua nominal total_price dari kolom Transaksi Lunas
+        $totalRevenue = Transaction::whereIn('status', ['settlement', 'success'])->sum('total_price');
         
-        // 2. Hitung jumlah tiket yang terjual (asumsi 1 transaksi = 1 tiket)
-        $ticketsSold = Transaction::where('status', 'success')->count();
+        // 2. Menghitung berapa orang tamu yang tiketnya sudah lunas
+        $ticketsSold = Transaction::whereIn('status', ['settlement', 'success'])->count();
         
-        // 3. Hitung event yang masih aktif (misal yang tanggalnya hari ini atau ke depan)
-        $activeEventsCount = Event::where('date', '>=', now())->count();
+        // 3. Menghitung jumlah acara mendatang yang aktif diselenggarakan
+        $activeEvents = Event::where('date', '>=', now())->count();
         
-        // 4. Hitung pesanan yang statusnya masih pending
-        $pendingOrdersCount = Transaction::where('status', 'pending')->count();
+        // 4. Menghitung transaksi tertunda (status belum dibayar pelanggan / expired)
+        $pendingOrders = Transaction::where('status', 'pending')->count();
+        
+        // 5. Menyertakan 5 daftar riwayat pesanan (history) paling mutakhir di panel
+        $recentTransactions = Transaction::with('event')->latest()->take(5)->get();
 
-        // 5. Ambil 5 transaksi terakhir untuk ditampilkan di tabel
-        $latestTransactions = Transaction::with('event')->orderBy('created_at', 'desc')->take(5)->get();
-
-        // Kirim semua variabel ke tampilan (view)
-        return view('admin.dashboard', compact(
-            'totalRevenue', 
-            'ticketsSold', 
-            'activeEventsCount', 
-            'pendingOrdersCount', 
-            'latestTransactions'
-        ));
+        return view('admin.dashboard', compact('totalRevenue', 'ticketsSold', 'activeEvents', 'pendingOrders', 'recentTransactions'));
     }
 }

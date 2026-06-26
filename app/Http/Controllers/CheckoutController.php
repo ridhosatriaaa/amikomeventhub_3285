@@ -28,7 +28,7 @@ class CheckoutController extends Controller
     {
         // 1. Validasi Input Kredensial Pelanggan
         $request->validate([
-            'customer_name' => 'required|string|max:255',
+            'customer_name'  => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
             'customer_phone' => 'required|string|max:20',
         ]);
@@ -43,21 +43,93 @@ class CheckoutController extends Controller
         $totalPrice = $event->price + 5000; // Menambahkan biaya admin (dummy)
 
         // 4. Merekam Transaksi ke Database
+        // Pastikan nama kolom (event_id, total_price, dll) sesuai dengan tabel migrations kamu
         $transaction = Transaction::create([
-            'event_id' => $event->id,
-            'order_id' => $orderId,
-            'customer_name' => $request->customer_name,
+            'order_id'       => $orderId,
+            'event_id'       => $event->id,
+            'customer_name'  => $request->customer_name,
             'customer_email' => $request->customer_email,
             'customer_phone' => $request->customer_phone,
-            'total_price' => $totalPrice,
-            'status' => 'Pending', // Status Awal
+            'total_price'    => $totalPrice,
+            'status'         => 'pending' 
         ]);
 
-        // 5. SEKARANG SUDAH DIARAHKAN LANGSUNG KE HALAMAN TIKET
-        // Membawa ID Event dan query string ?name=Nama_Pembeli
-        return redirect()->route('ticket', [
-            'id' => $event->id, 
-            'name' => $request->customer_name
-        ]); 
+        // --- INTEGRASI SNAP MIDTRANS ---
+        
+        // Konfigurasi Kredensial Environment Midtrans
+        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = false; // Mode Sandbox!
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+
+        // Susun Paket Array Data Transaksi
+        $params = [
+            'transaction_details' => [
+                'order_id'     => $orderId,
+                'gross_amount' => $totalPrice,
+            ],
+            'customer_details' => [
+                'first_name' => $request->customer_name,
+                'email'      => $request->customer_email,
+                'phone'      => $request->customer_phone,
+            ],
+        ];
+
+        try {
+            // Perintah Tembak Generate Snap Token
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            
+            // Update rekaman kita bahwa transaksi terkait sudah memiliki id token pelunasan
+            $transaction->update(['snap_token' => $snapToken]);
+            
+            // Redirect ke halaman antarmuka pembayaran final pelanggan
+            return redirect()->route('checkout.payment', $transaction->order_id);
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memproses pembayaran jaringan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Membuat Jendela Pembayaran (Snap UI)
+     */
+    public function payment($order_id)
+    {
+        // Mengambil daftar kategori untuk keperluan menu footer
+        $categories = Category::all();
+
+        // Mengambil data transaksi beserta relasi event-nya
+        $transaction = Transaction::with('event')->where('order_id', $order_id)->firstOrFail();
+        
+        return view('checkout.payment', compact('transaction', 'categories'));
+    }
+
+    /**
+     * Menangani halaman sukses pembayaran dan validasi status ke Midtrans
+     */
+    public function success($order_id)
+    {
+        // Mengambil daftar kategori untuk keperluan menu footer
+        $categories = Category::all();
+
+        $transaction = Transaction::where('order_id', $order_id)->firstOrFail();
+         
+        // Validasi status pembayaran asli dari Midtrans (Mencegah manipulasi URL)
+        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = false;
+         
+        try {
+            $midtransStatus = \Midtrans\Transaction::status($order_id);
+            
+            // Hanya ubah status menjadi sukses jika Midtrans mengonfirmasi pembayaran lunas
+            if (in_array($midtransStatus->transaction_status, ['capture', 'settlement'])) {
+                $transaction->update(['status' => 'success']);
+            }
+        } catch (\Exception $e) {
+            // Jika error (transaksi tidak ada di Midtrans, koneksi terputus), kembalikan ke beranda
+            return redirect()->route('home')->with('error', 'Transaksi tidak ditemukan atau gagal diproses oleh sistem pembayaran.');
+        }
+ 
+        return view('checkout.success', compact('transaction', 'categories'));
     }
 }

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('customer_email');
             $table->string('customer_phone');
             $table->integer('total_price'); 
-            $table->string('status')->default('Pending'); // success, Pending, failed
+            $table->string('status')->default('Pending');
+             // success, Pending, failed
             $table->timestamps();
         });
     }

@@ -41,6 +41,8 @@ Route::get('/checkout/{event}', [CheckoutController::class, 'create'])->name('ch
 
 // Rute Proses Simpan Checkout (Diperbarui menggunakan Route Model Binding)
 Route::post('/checkout/{event}', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/payment/{order_id}', [CheckoutController::class, 'payment'])->name('checkout.payment');
+Route::get('/success/{order_id}', [CheckoutController::class, 'success'])->name('checkout.success');
 
 // Rute e-ticket alternatif (Jika menggunakan Order ID)
 Route::get('/e-ticket/{order_id}', [EventController::class, 'showTicket'])->name('ticket.show');
@@ -87,6 +89,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // PARTNERS CRUD
         Route::resource('partners', PartnersController::class);
+        
         
     });
 });
