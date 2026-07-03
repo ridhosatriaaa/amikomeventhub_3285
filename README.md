@@ -27,3 +27,6 @@ https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/admin/login
 Pertemuan 10 - CHECKOUT LOGIC & TRANSAKSI
 https://amikomeventhub-3285-main-k6yvan.free.laravel.cloud/admin/transactions
 
+Pertemuan 11 - INTEGRASI MIDTRANS (SNAP)
+http://amikomeventhub3285.42web.io/
+
