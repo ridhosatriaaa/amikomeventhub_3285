@@ -33,3 +33,7 @@ http://amikomeventhub3285.42web.io/
 Pertemuan 12 - HANDLING WEBHOOK & DASHBOARD ADMIN
 http://amikomeventhub3285.42web.io/
 
+Pertemuan 13 - 10/07/2026 Membuat WEB menggunakan ai gemini
+https://github.com/ridhosatriaaa/newamikomeventhub3285
+
+
